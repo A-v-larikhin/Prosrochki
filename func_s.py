@@ -11,6 +11,14 @@ def make_res_dir(dir_name):
 
 
 def write_csv(data, dir, file):
+    '''
+    Функция для записи исходного массива временных данных в файл для анализа при поиске багов
+    (путь /data_in/номер договора/номер позиции.csv)
+    :param data: temp list from datafile
+    :param dir: contract number
+    :param file: position number
+    :return: nothing, just write file
+    '''
     make_res_dir(f'./data_in/{dir}')
     with open(f'./data_in/{dir}/{file}.csv', 'w') as file:
         writer = csv.writer(file)
@@ -19,6 +27,12 @@ def write_csv(data, dir, file):
 
 
 def write_csv_r(data, file):
+    '''
+    Функция для записи расчитанных значений в итоговый файл.
+    :param data: result list
+    :param file: filename
+    :return: nothing, just write file
+    '''
     #encoding = 'cp1251'
     with open(f'./result/{file}.csv', 'w') as file:
         writer = csv.writer(file)
@@ -62,7 +76,8 @@ def make_clear_dicts():
 
 def make_dicts_from_temp_list(temp_list, srok_postavki, dir, file):
     svodnaya_dict, postavka_dict, korrektirovka_dict = make_clear_dicts()
-    write_csv(temp_list, dir, file)
+ #   write_csv(temp_list, dir, file)    # Для проверки можно писать исходные данные в файл
+                                        #   (путь - /data_in/номер_договора/номер_позиции.csv)
     for row in temp_list:
         if 'Сводная' in row[0]:
             data_sv = datetime.strptime(row[0].split()[6], '%d.%m.%Y').date()
@@ -70,7 +85,7 @@ def make_dicts_from_temp_list(temp_list, srok_postavki, dir, file):
                 col = svodnaya_col_names[column]
                 if row[col] != '':
                     sv_value = int(row[col])
-                    sv_temp_list = [row[0], data_sv, sv_value, f'ne zakrblta: {srok_postavki_fact(current_date, data_sv)} days']
+                    sv_temp_list = [row[0], data_sv, sv_value, f'not closed: {srok_postavki_fact(current_date, data_sv)} days']
                     svodnaya_dict[column[4:]].append(sv_temp_list)
         elif 'Приобретение' in row[0]:
             data_pr = datetime.strptime(row[0].split()[6], '%d.%m.%Y').date()
